@@ -27,7 +27,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 HEADERS = {
-    "User-Agent": "MyNutritionProject/2.0 (brijeshtorpakwar@gmail.com)"
+    "User-Agent": "MyNutritionProject/2.0 (briil.com)"
 }
 
 BASE_URL = "https://world.openfoodfacts.org"
