@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 HEADERS = {
-    "User-Agent": "FoodScanner/1.0 (brijeshtorpakwar@gmail.com)"
+    "User-Agent": "FoodScanner/1.0 (com)"
 
 }
 
