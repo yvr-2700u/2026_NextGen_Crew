@@ -1,0 +1,321 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodTruth — Eat Smarter. Live Better.</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- Left-edge floating navigation: opens when the pointer reaches the edge. -->
+  <div class="sidebar-hover-zone" aria-hidden="true"></div>
+  <aside class="floating-sidebar" aria-label="FoodTruth navigation">
+    <a class="sidebar-brand" href="#top" aria-label="FoodTruth home">
+      <img src="{{ url_for('static', filename='img/foodtruth-logo.png') }}" alt="FoodTruth">
+    </a>
+    <nav class="sidebar-nav">
+      <a href="#top" class="sidebar-link active"><span aria-hidden="true">&#8962;</span><span>Dashboard</span></a>
+      <a href="#scanner" class="sidebar-link"><span aria-hidden="true">&#9611;</span><span>Scan Product</span></a>
+      <a href="#scanner" class="sidebar-link"><span aria-hidden="true">&#10024;</span><span>AI Analysis</span></a>
+      <a href="#health-score" class="sidebar-link"><span aria-hidden="true">&#9829;</span><span>Health Score</span></a>
+      <a href="#ingredients" class="sidebar-link"><span aria-hidden="true">&#9879;</span><span>Ingredients</span></a>
+      <a href="#warnings" class="sidebar-link"><span aria-hidden="true">&#9888;</span><span>Warnings</span></a>
+      <a href="#alternatives" class="sidebar-link"><span aria-hidden="true">&#8635;</span><span>Better Alternatives</span></a>
+      <a href="#compare" class="sidebar-link"><span aria-hidden="true">&#9878;</span><span>Compare Products</span></a>
+    </nav>
+    <p class="sidebar-hint">Move to the left edge</p>
+  </aside>
+
+  <!-- ================= HEADER ================= -->
+  <header class="site-header" id="top">
+    <div class="logo-box">
+      <a href="#top" aria-label="FoodTruth home">
+        <img class="header-logo" src="{{ url_for('static', filename='img/foodtruth-logo.png') }}" alt="FoodTruth">
+      </a>
+    </div>
+    <nav class="main-nav">
+      <a href="#" class="active">Home</a>
+      <a href="#scanner">Scan</a>
+      <a href="#">Categories</a>
+      <a href="#">Compare</a>
+      <a href="#">About</a>
+    </nav>
+    <button class="signin-btn">Sign In</button>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="hero-copy">
+      <img class="hero-logo" src="{{ url_for('static', filename='img/foodtruth-logo.png') }}" alt="FoodTruth">
+      <h1>Making every food label meaningful</h1>
+      <p class="hero-subtext">Scan any barcode to get AI-powered insights on ingredients, health score, and smarter choices for you and your family.</p>
+
+      <div class="hero-divider"></div>
+
+      <div class="hero-features">
+        <div class="hero-feature">
+          <span class="hero-feature-icon" aria-hidden="true">&#129504;</span>
+          <div class="hero-feature-text">
+            <h3>AI Ingredient Analysis</h3>
+            <p>Understand every ingredient and what it means for you.</p>
+          </div>
+        </div>
+        <div class="hero-feature">
+          <span class="hero-feature-icon" aria-hidden="true">&#9829;</span>
+          <div class="hero-feature-text">
+            <h3>Health Score (0&ndash;100)</h3>
+            <p>Get a quick health score to know how good your food is.</p>
+          </div>
+        </div>
+        <div class="hero-feature">
+          <span class="hero-feature-icon" aria-hidden="true">&#127807;</span>
+          <div class="hero-feature-text">
+            <h3>Better Alternatives</h3>
+            <p>Discover healthier options to make better choices.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <img class="hero-laptop-art" src="{{ url_for('static', filename='img/foodtruth-laptop-doodle-transparent.png') }}" alt="Laptop illustration">
+  </section>
+
+  <!-- ================= SCANNER CARD ================= -->
+  <section class="card scanner-card" id="scanner">
+
+    <form id="scan-form" method="POST" action="/" enctype="multipart/form-data">
+
+      <div class="scanner-top">
+        <div class="mode-toggle">
+          <button type="button" id="mode-barcode" class="mode-btn active">Enter Barcode</button>
+          <button type="button" id="mode-search" class="mode-btn">Search Product</button>
+        </div>
+
+        <div class="input-row" id="barcode-row">
+          <input type="text" name="barcode" id="barcode-input" placeholder="Enter barcode number">
+          <label class="upload-btn" for="barcode_image">
+            Upload barcode
+            <input type="file" name="barcode_image" id="barcode_image" accept="image/*" hidden>
+          </label>
+          <button type="submit" class="search-icon-btn" aria-label="Search">&#128269;</button>
+        </div>
+
+        <div class="input-row" id="search-row" style="display:none;">
+          <div class="autocomplete-wrap">
+            <input type="text" name="product_name" id="product-name-input" placeholder="Search product by name" autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
+          </div>
+          <button type="submit" class="search-icon-btn" aria-label="Search">&#128269;</button>
+        </div>
+
+      </div>
+
+      <div class="scanner-main">
+        <div class="product-image-box">
+          {% if product.image %}
+            <img src="{{ product.image }}" alt="{{ product.name }}">
+          {% else %}
+            <img src="{{ url_for('static', filename='img/placeholder.png') }}" alt="No product scanned yet" class="placeholder-img">
+          {% endif %}
+        </div>
+
+        <div class="product-details">
+          <h2>Product Details</h2>
+          <p><strong>Name:</strong> <span>{{ product.name | default('—', true) }}</span></p>
+          <p><strong>Brand:</strong> <span>{{ product.brand | default('—', true) }}</span></p>
+          <p><strong>Barcode:</strong> <span>{{ product.barcode | default('—', true) }}</span></p>
+        </div>
+      </div>
+    </form>
+
+    <div class="score-row">
+      <div class="score-pill eco-pill" data-grade="{{ product.ecoscore | default('', true) }}">
+        Eco-score: <strong>{{ product.ecoscore | default('—', true) }}</strong>
+      </div>
+      <div class="score-pill nutri-pill" data-grade="{{ product.nutriscore | default('', true) }}">
+        Nutri-Score: <strong>{{ product.nutriscore | default('—', true) }}</strong>
+      </div>
+      <div class="score-pill nova-pill" data-group="{{ product.nova_group | default('', true) }}">
+        Nova-Group: <strong>{{ product.nova_group | default('—', true) }}</strong>
+      </div>
+    </div>
+
+    <div class="score-explain-row">
+      <p><a href="#">Green-Score</a> is an experimental score that summarizes the environmental impacts of food products.</p>
+      <p>The score from A to E is calculated based on nutrients and foods to favor (proteins, fiber, fruits, vegetables and legumes) and nutrients to limit (calories, saturated fat, sugars, salt).</p>
+      <p>Group 1 - Unprocessed or minimally processed foods<br>
+         Group 2 - Processed culinary ingredient<br>
+         Group 3 - Processed foods<br>
+         Group 4 - Ultra-processed food and drink products</p>
+    </div>
+  </section>
+
+  <!-- ================= NUTRITION + INGREDIENTS ================= -->
+  <section class="card nutrition-card" id="ingredients">
+    <div class="nutrition-box">
+      <h2>Nutrition (Per 100g)</h2>
+      <table class="nutrition-table">
+        <tbody>
+          <tr><td>Calories</td><td>{{ product.calories | default('—', true) }}</td></tr>
+          <tr><td>Protein</td><td>{{ product.protein | default('—', true) }}</td></tr>
+          <tr><td>Carbs</td><td>{{ product.carbs | default('—', true) }}</td></tr>
+          <tr><td>Sugar</td><td>{{ product.sugar | default('—', true) }}</td></tr>
+          <tr><td>Fat</td><td>{{ product.fat | default('—', true) }}</td></tr>
+          <tr><td>Fiber</td><td>{{ product.fiber | default('—', true) }}</td></tr>
+          <tr><td>Salt</td><td>{{ product.salt | default('—', true) }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ingredients-box">
+      <h2>Ingredients :</h2>
+      <p class="ingredients-text">{{ product.ingredients | default('—', true) }}</p>
+      {% if product.ingredients_explained %}
+      <p class="ingredients-explained">{{ product.ingredients_explained }}</p>
+      {% elif product.ingredients and product.ingredients != 'N/A' %}
+      <p class="ingredients-explained"><em>Plain-language explanation unavailable &mdash; set the GEMINI_API_KEY environment variable to enable it.</em></p>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- ================= HEALTH SCORE ================= -->
+  <section class="card health-card" id="health-score">
+    <h2 class="section-title">&#9825; Health score (0&ndash;100)</h2>
+
+    {% if product.health_score is defined and product.health_score is not none %}
+    <div class="health-score-box">
+      <span class="health-score-label">Health Score</span>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" style="width: {{ product.health_score }}%;"></div>
+        <span class="progress-bar-number">{{ product.health_score | round(0, 'floor') | int }}</span>
+      </div>
+    </div>
+    {% else %}
+    <div class="health-score-box empty-state">
+      {% if product.name %}
+      <span>No Eco-Score, Nutri-Score, or NOVA data available for this product.</span>
+      {% else %}
+      <span>Scan or search a product to see its Health Score.</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="banner banner-green">
+      Our project combines the A-to-E Nutri-Score, environmental Eco-Score, and NOVA processing tiers into a single health rating. This unified score delivers a fast, comprehensive look at how a food product affects human biology and the planet. Users get an instant understanding of a food's nutritional value, sustainability, and industrial processing level.
+    </div>
+  </section>
+
+  <!-- ================= NUTRITION WARNING ================= -->
+  <section class="card" id="warnings">
+    <p class="section-intro">Nutrition Warning : The selected region shows a Nutrition Warning System table that provides an age-wise health analysis for the product</p>
+
+    {% if product.warnings %}
+    <table class="warning-table">
+      <thead>
+        <tr>
+          <th colspan="5" class="warning-title-row">
+            Nutrition Warning System
+            <span class="warning-subtitle">Age-wise Health Analysis</span>
+          </th>
+        </tr>
+        <tr>
+          <th colspan="5" class="warning-product-row">Product : {{ product.name | default('—', true) }}</th>
+        </tr>
+        <tr class="warning-header-row">
+          <th>Nutrient</th>
+          <th>Children (4-12)</th>
+          <th>Adults</th>
+          <th>Elderly (60+)</th>
+          <th>Diabetics</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for nutrient in ['Sugar', 'Salt', 'Saturated Fat'] %}
+        <tr>
+          <td class="nutrient-name">{{ nutrient }}</td>
+          {% for age in ['Children', 'Adults', 'Elderly', 'Diabetics'] %}
+          <td class="level-{{ product.warnings[nutrient][age].class }}">{{ product.warnings[nutrient][age].text }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="banner banner-yellow">
+      The table evaluates three key nutritional components&mdash;Sugar, Salt, and Saturated Fat&mdash;across four distinct demographic and health categories: Children (4&ndash;12), Adults, Elderly (60+), and Diabetics.
+    </div>
+    {% else %}
+    <div class="empty-state">Scan or search a product to see its age-wise nutrition warnings.</div>
+    {% endif %}
+  </section>
+
+  <!-- ================= HEALTHIER ALTERNATIVE ================= -->
+  <section class="card" id="alternatives">
+    <h2 class="section-title">Healthier Alternative</h2>
+
+    {% if product.alternative %}
+    <div class="alternative-box">
+      <div class="alternative-image">
+        {% if product.alternative.image %}
+          <img src="{{ product.alternative.image }}" alt="{{ product.alternative.name }}">
+        {% else %}
+          <img src="{{ url_for('static', filename='img/placeholder.png') }}" alt="{{ product.alternative.name }}">
+        {% endif %}
+      </div>
+      <div class="alternative-details">
+        <h3>{{ product.alternative.name }}</h3>
+        <p class="alternative-brand">{{ product.alternative.brand }}</p>
+        <p class="alternative-reason">{{ product.alternative.reason }}</p>
+      </div>
+    </div>
+    {% elif product.alternative_search_unavailable %}
+    <div class="empty-state">Open Food Facts' product search is temporarily unavailable, so we couldn't look for a healthier alternative right now. Please try again shortly.</div>
+    {% elif product.name %}
+    <div class="empty-state">No suitable healthier alternative was found in this product's category on Open Food Facts.</div>
+    {% else %}
+    <div class="empty-state">Scan or search a product to see a healthier alternative.</div>
+    {% endif %}
+  </section>
+
+  <!-- ================= COMPARE PRODUCT ================= -->
+  <section class="card" id="compare">
+    <h2 class="section-title">Compare Product</h2>
+
+    {% if product.alternative %}
+    <div class="compare-header-row">
+      <div class="compare-col">
+        <div class="compare-image-box">
+          {% if product.image %}<img src="{{ product.image }}" alt="{{ product.name }}">{% endif %}
+        </div>
+        <span>{{ product.name }}</span>
+      </div>
+      <div class="compare-col compare-col-alt">
+        <div class="compare-image-box">
+          {% if product.alternative.image %}<img src="{{ product.alternative.image }}" alt="{{ product.alternative.name }}">{% endif %}
+        </div>
+        <span>{{ product.alternative.name }}</span>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead>
+        <tr><th>Nutrient</th><th>Scanned Product</th><th>Alternative</th></tr>
+      </thead>
+      <tbody>
+        {% for row in product.alternative.comparison %}
+        <tr>
+          <td>{{ row.label }}</td>
+          <td>{{ row.current }}</td>
+          <td>{{ row.alternative }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">A comparison will appear here once a healthier alternative is found.</div>
+    {% endif %}
+  </section>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
