@@ -11,13 +11,14 @@ from health_score import score_from_product
 from nutrition_warning import get_nutrition_warnings
 from alternative_finder import get_alternative_and_comparison
 from ingredient_explainer import explain_ingredients
+from Buy import get_buy_links, get_google_search_url
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 HEADERS = {
-    "User-Agent": "FoodScanner/1.0 (com)"
+    "User-Agent": "FoodScanner/1.0 (brijeshtorpakwar@gmail.com)"
 
 }
 
@@ -147,6 +148,17 @@ def analyze_product(raw_product):
     except Exception:
         logger.exception("explain_ingredients failed")
         data["ingredients_explained"] = None
+
+    try:
+        data["buy_links"] = get_buy_links(data["name"])
+        data["google_search_url"] = get_google_search_url(data["name"])
+        if data.get("alternative"):
+            data["alternative"]["buy_links"] = get_buy_links(data["alternative"]["name"])
+            data["alternative"]["google_search_url"] = get_google_search_url(data["alternative"]["name"])
+    except Exception:
+        logger.exception("buy link generation failed")
+        data["buy_links"] = []
+        data["google_search_url"] = None
 
     return data
 
